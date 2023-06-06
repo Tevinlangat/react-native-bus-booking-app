@@ -1,0 +1,324 @@
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Modal,
+  Image,
+  ScrollView,
+  TextInput,
+  FlatList,
+} from "react-native";
+import React, { useState } from "react";
+import { useRoute } from "@react-navigation/native";
+import {
+  MaterialCommunityIcons,
+  Entypo,
+  Icon,
+  FontAwesome,
+  MaterialIcons,
+} from "@expo/vector-icons";
+import { windowWidth, windowHeight } from "../utils/Dimensions";
+import Seats from "../components/Seats";
+import { width } from "deprecated-react-native-prop-types/DeprecatedImagePropType";
+
+const BookingPage = ({ navigation }) => {
+  const route = useRoute();
+
+  let amount = route.params?.Amount;
+  const destination = route.params?.destination
+  const title = route.params?.title
+  const trip = `${destination} to ${title}`
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [phone, setPhone] = useState();
+
+  const makePayment = async () => {
+    getAllSeats()
+    fetch("https://cyan-difficult-catfish.cyclic.app/token", {
+      method: "POST",
+      body: JSON.stringify({
+        phone: phone,
+        amount: amount,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).catch((error) => {
+      console.log(error.message);
+    });
+  };
+
+
+  const [row1,setRow1] = useState([
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+  ])
+
+  const [row2,setRow2] = useState([
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    {empty:true,selected:false},
+    
+  ])
+
+  let selectedSeats =[]
+
+  const onSelectRow1=(index)=>{
+    let tempRow = []
+    tempRow = row1
+    tempRow.map((item,ind)=>{
+        if(index==ind){
+            if(item.selected==true){
+
+                item.selected=false
+                item.empty=true
+            }else{
+
+                item.selected=true
+                item.empty=false
+            }
+        }
+    })
+
+    let tempSeat=[]
+    tempRow.map(item=>{
+        tempSeat.push(item)
+    })
+    setRow1(tempSeat)
+
+  }
+
+
+  const onSelectRow2=(index)=>{
+    let tempRow = []
+    tempRow = row2
+    tempRow.map((item,ind)=>{
+        if(index==ind){
+            if(item.selected==true){
+
+                item.selected=false
+                item.empty=true
+            }else{
+
+                item.selected=true
+                item.empty=false
+            }
+        }
+    })
+
+    let tempSeat=[]
+    tempRow.map(item=>{
+        tempSeat.push(item)
+    })
+    setRow2(tempSeat)
+
+  }
+
+  const getAllSeats=()=>{
+    row1.map((item)=>{
+        if(item.selected==true){
+            selectedSeats.push(1)
+        }
+    })
+    row2.map((item)=>{
+        if(item.selected==true){
+            selectedSeats.push(1)
+        }
+    })
+
+    amount = amount*selectedSeats.length
+  }
+
+
+  return (
+    <>
+      
+
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: "20%",
+          margin:'10%'
+        }}
+      >
+        <Text>{trip}</Text>
+        <View
+          style={{
+            width: "100%",
+            height: "100%",
+            borderWidth: 3,
+            borderColor: "#a4133c",
+            borderRadius: 28,
+          }}
+        >
+          <Image
+            source={require("../assets/icons8-steering-64.png")}
+            style={{ height: 32, width: 32, alignSelf: "flex-end",margin:10 }}
+          />
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <View>
+                <FlatList data={row1} numColumns={2} style={{margin:8}} renderItem={({item,index})=>{
+                    return(
+                        <TouchableOpacity style={{margin:8}} onPress={()=>{
+                            if(item.selected==false && item.empty==false){
+                                alert('already booked')
+                            }else{
+                                onSelectRow1(index)
+                            }
+                        }} >
+                            {
+                            item.empty==false && item.selected==true?( <MaterialIcons name="event-seat" size={32} color="#22223b" />):
+                            item.empty==true && item.selected==false?(<MaterialIcons name="event-seat" size={32} color="#C9C9C9" />):
+                            item.empty==false && item.selected==false?(<MaterialIcons name="event-seat" size={32} color="#187795" />): null
+                        }
+                        </TouchableOpacity>
+                    )
+                }}/>
+            </View>
+            <View>
+            <FlatList data={row2} numColumns={2} style={{margin:8}} renderItem={({item,index})=>{
+                    return(
+                        <TouchableOpacity style={{margin:8}} onPress={()=>{
+                            if(item.selected==false && item.empty==false){
+                                alert('already booked')
+                            }else{
+                                onSelectRow2(index)
+                            }
+                        }}>
+                            {
+                            item.empty==false && item.selected==true?( <MaterialIcons name="event-seat" size={32} color="#22223b" />):
+                            item.empty==true && item.selected==false?(<MaterialIcons name="event-seat" size={32} color="#C9C9C9" />):
+                            item.empty==false && item.selected==false?(<MaterialIcons name="event-seat" size={32} color="#187795" />): null
+                        }
+                        </TouchableOpacity>
+                    )
+                }}/>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <TouchableOpacity
+        onPress={() => {
+          setModalOpen(true);
+        }}
+      >
+        <View style={styles.bookButton}>
+          <Text style={{ color: "#495057", fontWeight: "bold", fontSize: 18 }}>
+            Book Now
+          </Text>
+        </View>
+      </TouchableOpacity>
+      <Modal visible={modalOpen}>
+        <View>
+          <View style={{ flexDirection: "row", alignContent: "flex-end" }}>
+            <TouchableOpacity onPress={() => setModalOpen(false)}>
+              <MaterialIcons name="close" size={32} />
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginHorizontal: "20%" }}>
+            <Image
+              source={require("../assets/M-PESA_LOGO-01.png")}
+              style={{ width: 200, resizeMode: "contain" }}
+            />
+          </View>
+          <View>
+            <View style={styles.inputField}>
+              <TextInput
+                placeholder="Enter Phone number"
+                style={{ flexGrow: 1 }}
+                keyboardType="numeric"
+                value={phone}
+                onChangeText={(phone) => setPhone(phone)}
+              />
+            </View>
+          </View>
+          <TouchableOpacity onPress={() => makePayment()}>
+            <View style={styles.bookButton}>
+              <Text
+                style={{ color: "#495057", fontWeight: "bold", fontSize: 18 }}
+              >
+                PAY
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </>
+  );
+};
+
+export default BookingPage;
+
+const styles = StyleSheet.create({
+  busView: {
+    padding: 28,
+    marginHorizontal: 30,
+    marginTop: "30%",
+    borderWidth: 3,
+    borderColor: "#a4133c",
+    borderRadius: 28,
+  },
+  bookButton: {
+    padding: 8,
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderColor: "#ce4257",
+    borderWidth: 4,
+    borderRadius: 10,
+    width: windowWidth - 80,
+    marginHorizontal: 30,
+    marginTop: 40,
+  },
+  inputField: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomColor: "#ccc",
+    borderBottomWidth: 2,
+    paddingBottom: 6,
+    marginBottom: 25,
+    marginHorizontal: "15%",
+    marginVertical: "15%",
+  },
+});
